@@ -1,32 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <translation>
     <Rows id="1" name="modules/admins.go:26">
-        <value>👤 &lt;b&gt;Tidak ada pengguna yang ditunjuk.&lt;/b&gt;</value>
+        <value>👤 &lt;b&gt;Anda belum menunjuk pengguna.&lt;/b&gt;</value>
         <!--modules/admins.go:26-->
     </Rows>
-    <Rows id="3" name="modules/admins.go:41">
-        <value>⚠ &lt;b&gt;Pengguna telah diblokir dengan alasan yang sama!&lt;/b&gt;</value>
+    <Rows id="2" name="modules/admins.go:41">
+        <value>⚠ &lt;b&gt;Pengguna telah di ban dengan alasan yang sama!&lt;/b&gt;</value>
         <!--modules/admins.go:41-->
     </Rows>
-    <Rows id="4" name="modules/admins.go:46">
+    <Rows id="3" name="modules/admins.go:46">
         <value>&lt;b&gt;Pembaruan Gban&lt;/b&gt;
-            👤 &lt;b&gt;User ID:&lt;/b&gt; <code>{1}</code>
+            👤 &lt;b&gt;User ID:&lt;/b&gt; &lt;code&gt;{1}&lt;/code&gt;
             ✍ &lt;b&gt;Alasan Terbaru:&lt;/b&gt; &lt;code&gt;{2}&lt;/code&gt;.</value>
         <!--modules/admins.go:46-->
     </Rows>
-    <Rows id="5" name="modules/admins.go:57">
-        <value>🚫 &lt;b&gt;Memulai pemblokiran global atas&lt;/b&gt;
-            👤 &lt;b&gt;User ID:&lt;/b&gt; <code>{1}</code></value>
-        <!--modules/admins.go:57-->
+    <Rows id="4" name="modules/admins.go:55">
+        <value>🚫 &lt;b&gt;Memulai prosedur ban dari&lt;/b&gt;
+            👤 &lt;b&gt;User ID:&lt;/b&gt; &lt;code&gt;{1}&lt;/code&gt;</value>
+        <!--modules/admins.go:55-->
     </Rows>
-    <Rows id="6" name="modules/admins.go:78">
+    <Rows id="5" name="modules/admins.go:75">
         <value>&lt;b&gt;Gban Baru&lt;/b&gt;
-            👤 &lt;b&gt;User ID:&lt;/b&gt; <code>{1}</code>
-            ✍ &lt;b&gt;Alasan:&lt;/b&gt; <code>{2}</code></value>
-        <!--modules/admins.go:78-->
+            👤 &lt;b&gt;User ID:&lt;/b&gt; &lt;code&gt;{1}&lt;/code&gt;
+            ✍ &lt;b&gt;Alasan:&lt;/b&gt; &lt;code&gt;{2}&lt;/code&gt;</value>
+        <!--modules/admins.go:75-->
     </Rows>
-    <Rows id="7" name="modules/admins.go:86">
-    <value>❌ &lt;b&gt;Anda bukan sudo&lt;/b&gt;</value>
-    <!--modules/admins.go:7-->
-    <Counter>7</Counter>
+    <Rows id="6" name="modules/admins.go:81">
+        <value>❌ &lt;b&gt;Anda Bukan Sudo&lt;/b&gt;</value>
+        <!--modules/admins.go:81-->
+    </Rows>
+    <Counter>6</Counter>
 </translation>

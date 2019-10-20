@@ -21,7 +21,7 @@ func panel(b ext.Bot, u *gotgbot.Update) error {
 	user := u.EffectiveUser
 
 	if chat.Type == "supergroup" {
-		if chat_status.IsUserAdmin(chat, user.Id, nil) == true {
+		if chat_status.IsUserAdmin(chat, user.Id) == true {
 			teks, _, kn := function.MainMenu(chat.Id)
 			reply := b.NewSendableMessage(chat.Id, teks)
 			reply.ReplyMarkup = &ext.InlineKeyboardMarkup{&kn}
@@ -34,7 +34,6 @@ func panel(b ext.Bot, u *gotgbot.Update) error {
 	return nil
 }
 
-
 func backquery(b ext.Bot, u *gotgbot.Update) error {
 	var err error
 	msg := u.CallbackQuery
@@ -43,7 +42,7 @@ func backquery(b ext.Bot, u *gotgbot.Update) error {
 
 	if msg != nil {
 		if chat.Type == "supergroup" {
-			if chat_status.IsUserAdmin(chat, user.Id, nil) == true {
+			if chat_status.IsUserAdmin(chat, user.Id) == true {
 				teks, _, kn := function.MainMenu(chat.Id)
 				_, err = b.EditMessageTextMarkup(chat.Id, msg.Message.MessageId, teks, parsemode.Html,
 					&ext.InlineKeyboardMarkup{&kn})
@@ -65,7 +64,7 @@ func closequery(b ext.Bot, u *gotgbot.Update) error {
 
 	if msg != nil {
 		if chat.Type == "supergroup" {
-			if chat_status.IsUserAdmin(chat, user.Id, nil) == true {
+			if chat_status.IsUserAdmin(chat, user.Id) == true {
 				_, err = msg.Message.Delete()
 				return err
 			}
@@ -85,7 +84,7 @@ func settingquery(b ext.Bot, u *gotgbot.Update) error {
 
 	if msg != nil {
 		if chat.Type == "supergroup" {
-			if chat_status.IsUserAdmin(chat, user.Id, nil) == true {
+			if chat_status.IsUserAdmin(chat, user.Id) == true {
 				if msg.Data == "mk_utama" {
 					teks, _, kn := function.MainControlMenu(chat.Id)
 					_, err = b.EditMessageTextMarkup(chat.Id, msg.Message.MessageId,
@@ -122,7 +121,7 @@ func usercontrolquery(b ext.Bot, u *gotgbot.Update) error {
 
 	if msg != nil {
 		if chat.Type == "supergroup" {
-			if chat_status.IsUserAdmin(chat, user.Id, nil) == true {
+			if chat_status.IsUserAdmin(chat, user.Id) == true {
 				// Grab Data From DB
 				username := sql.GetUsername(chat.Id)
 				fotoprofil := sql.GetPicture(chat.Id)
@@ -320,6 +319,5 @@ func LoadSettingPanel(u *gotgbot.Updater) {
 		closequery))
 	u.Dispatcher.AddHandler(handlers.NewCallback(regexp.MustCompile("^back").String(),
 		backquery))
-
 
 }

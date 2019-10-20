@@ -1,7 +1,6 @@
 package sql
 
 import (
-	"fmt"
 	"github.com/PaulSonOfLars/gotgbot"
 	"github.com/PaulSonOfLars/gotgbot/ext"
 	"github.com/go-redis/redis"
@@ -30,23 +29,21 @@ func InitDb(b ext.Bot, u *gotgbot.Update) {
 
 	// Auto migrate tables
 	db.AutoMigrate(&User{}, &Chat{}, &UserSpam{}, &ChatSpam{}, &Setting{}, &Verify{}, &Picture{}, &Username{},
-	&EnforceGban{}, &Lang{})
+		&EnforceGban{}, &Lang{})
 	log.Println("Database has been connected & Auto-migrated database schema")
 
 	// redis
 	client := redis.NewClient(&redis.Options{
-		Addr:     fmt.Sprintf("%v:%v", bot.BotConfig.RedisAddress),
+		Addr:     bot.BotConfig.RedisAddress,
 		Password: bot.BotConfig.RedisPassword, // no password set
-		DB:       0,  // use default DB
+		DB:       0,                           // use default DB
 	})
 
 	REDIS = client
-	pong, err := client.Ping().Result()
-	log.Println(pong, err)
+	err = client.Ping().Err()
 	if err == nil {
 		log.Println("Redis Has Been Connected")
 	}
 	defer REDIS.BgSave()
 	// Output: PONG <nil>
 }
-

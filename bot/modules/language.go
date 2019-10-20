@@ -12,49 +12,63 @@ import (
 	"github.com/jumatberkah/antispambot/bot/modules/sql"
 )
 
-
-func GetString (chat_id int, val string) string {
+func GetString(chat_id int, val string) string {
 	var err error
-	lang, err := sql.REDIS.Get(fmt.Sprintf("lang_%s", chat_id)).Result()
-	if err == redis.Nil{
-		lang = "en-GB"
+	lang, err := sql.REDIS.Get(fmt.Sprintf("lang_%v", chat_id)).Result()
+	if err == redis.Nil || lang == "" {
+		lang = sql.GetLang(chat_id).Lang
+	} else if err != nil {
+		err_handler.HandleErr(err)
+		return err.Error()
 	}
-	err_handler.HandleErr(err)
 	return goloc.Trnl(lang, val)
 }
 
-func GetStringf (chat_id int, val string, args map[string]string) string {
+func GetStringf(chat_id int, val string, args map[string]string) string {
 	var err error
-	lang, err := sql.REDIS.Get(fmt.Sprintf("lang_%s", chat_id)).Result()
-	if err == redis.Nil{
-		lang = "en-GB"
+	lang, err := sql.REDIS.Get(fmt.Sprintf("lang_%v", chat_id)).Result()
+	if err == redis.Nil || lang == "" {
+		lang = sql.GetLang(chat_id).Lang
+	} else if err != nil {
+		err_handler.HandleErr(err)
+		return err.Error()
 	}
 	err_handler.HandleErr(err)
 	return goloc.Trnlf(lang, val, args)
 }
 
-
-func setlang (b ext.Bot, u *gotgbot.Update, args []string) error {
+func setlang(b ext.Bot, u *gotgbot.Update, args []string) error {
 	msg := u.EffectiveMessage
 	chat := u.EffectiveChat
 	user := u.EffectiveUser
 
-	if chat_status.IsUserAdmin(chat, user.Id, nil) {
-		if goloc.IsLangSupported(args[0]) {
-			_, err := sql.REDIS.Set(fmt.Sprintf("lang_%s", chat.Id), args[0], 0).Result()
-			if err != nil {
-				sql.UpdateLang(chat.Id, args[0])
-				_, err = msg.ReplyText("Language has been changed.")
-				return err
+	if chat_status.IsUserAdmin(chat, user.Id) {
+		if len(args[0]) != 0 {
+			if goloc.IsLangSupported(args[0]) {
+				_, err := sql.REDIS.Set(fmt.Sprintf("lang_%v", chat.Id), args[0], 0).Result()
+				if err != nil {
+					sql.UpdateLang(chat.Id, args[0])
+					_, err = msg.ReplyText(GetStringf(chat.Id, "modules/language.go:51", map[string]string{"1": args[0]}))
+					return err
+				} else {
+					_, err = msg.ReplyText("Language has been changed!")
+					return err
+				}
 			} else {
-				_, err = msg.ReplyText("Language has been changed.")
+				_, err := msg.ReplyText(GetString(chat.Id, "modules/language.go:58"))
 				return err
 			}
+		} else {
+			_, err := msg.ReplyText("/setlang en-GB -> For English\n /setlang ID -> For Indonesian")
+			return err
 		}
+
+	} else {
+		_, err := msg.Delete()
+		return err
 	}
-	return gotgbot.ContinueGroups{}
 }
 
-func LoadLang (u *gotgbot.Updater) {
+func LoadLang(u *gotgbot.Updater) {
 	u.Dispatcher.AddHandler(handlers.NewArgsCommand("setlang", setlang))
 }

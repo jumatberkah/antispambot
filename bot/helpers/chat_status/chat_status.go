@@ -1,12 +1,20 @@
 package chat_status
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/PaulSonOfLars/gotgbot/ext"
+	"github.com/go-redis/redis"
 	"github.com/jumatberkah/antispambot/bot"
 	"github.com/jumatberkah/antispambot/bot/helpers/err_handler"
 	"github.com/jumatberkah/antispambot/bot/helpers/function"
+	"github.com/jumatberkah/antispambot/bot/modules/sql"
 	"strconv"
 )
+
+type cache struct {
+	Adminid []string `json:"admin"`
+}
 
 func CanDelete(chat *ext.Chat, botId int) bool {
 	k, err := chat.GetMember(botId)
@@ -23,20 +31,35 @@ func IsOwner(userId int) bool {
 	return false
 }
 
-func IsUserAdmin(chat *ext.Chat, userId int, member *ext.ChatMember) bool {
-	if chat.Type == "private" || function.Contains(bot.BotConfig.SudoUsers, strconv.Itoa(userId)) {
+func admincache(chat *ext.Chat) {
+	adm, _ := chat.GetAdministrators()
+	admins := make([]string, 0)
+	for _, a := range adm {
+		admins = append(admins, strconv.Itoa(a.User.Id))
+	}
+	one := &cache{admins}
+	jsonad, _ := json.Marshal(one)
+	sql.REDIS.Set(fmt.Sprintf("admin_%v", chat.Id), jsonad, 3600)
+}
+
+func IsUserAdmin(chat *ext.Chat, user_id int) bool {
+	if chat.Type == "private" {
 		return true
 	}
-	if member == nil {
-		mem, err := chat.GetMember(userId)
-		err_handler.HandleErr(err)
-		member = mem
-	}
-	if member.Status == "administrator" || member.Status == "creator" {
+	if function.Contains(bot.BotConfig.SudoUsers, strconv.Itoa(user_id)) {
 		return true
-	} else {
-		return false
 	}
+
+	admins, err := sql.REDIS.Get(fmt.Sprintf("admin_%v", chat.Id)).Result()
+	if err == redis.Nil {
+		admincache(chat)
+	}
+	var p cache
+	_ = json.Unmarshal([]byte(admins), &p)
+	if function.Contains(p.Adminid, strconv.Itoa(user_id)) {
+		return true
+	}
+	return false
 }
 
 func IsBotAdmin(chat *ext.Chat, member *ext.ChatMember) bool {
@@ -69,7 +92,7 @@ func RequireBotAdmin(chat *ext.Chat, msg *ext.Message) bool {
 }
 
 func RequireUserAdmin(chat *ext.Chat, msg *ext.Message, userId int, member *ext.ChatMember) bool {
-	if !IsUserAdmin(chat, userId, member) {
+	if !IsUserAdmin(chat, userId) {
 		_, err := msg.ReplyText("Anda harus menjadi administrator untuk melakukannya.")
 		err_handler.HandleErr(err)
 		return false

@@ -6,7 +6,7 @@ import (
 )
 
 type Lang struct {
-	ChatId   string `gorm:"primary_key"`
+	ChatId string `gorm:"primary_key"`
 	Lang   string `gorm:"not null"`
 }
 

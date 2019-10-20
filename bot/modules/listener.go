@@ -34,7 +34,7 @@ func username(b ext.Bot, u *gotgbot.Update) error {
 	if db.Option != "true" {
 		return gotgbot.EndGroups{}
 	}
-	if chat_status.IsUserAdmin(chat, msg.From.Id, nil) == true {
+	if chat_status.IsUserAdmin(chat, msg.From.Id) == true {
 		return gotgbot.EndGroups{}
 	}
 
@@ -42,17 +42,18 @@ func username(b ext.Bot, u *gotgbot.Update) error {
 		if chat.Type == "supergroup" {
 			if user.Username == "" {
 				bantime := extraction.ExtractTime(b, msg, sql.GetSetting(chat.Id).Time)
-				replytext := fmt.Sprintf("🔇 <a href=\"tg://user?id=%v\">%v</a> telah <b>di%v</b> "+
-					"karena belum memasang <b>username</b>. [<code>%v</code>]", user.Id, user.FirstName, db.Action, user.Id)
+				replytext := GetStringf(msg.Chat.Id, "modules/listener.go:45",
+					map[string]string{"1": strconv.Itoa(user.Id), "2": user.FirstName, "3": db.Action,
+						"4": strconv.Itoa(user.Id)})
 
 				kb := make([][]ext.InlineKeyboardButton, 1)
 				kb[0] = make([]ext.InlineKeyboardButton, 1)
-				kb[0][0] = ext.InlineKeyboardButton{Text: "🔊 Saya Sudah Pasang Username",
+				kb[0][0] = ext.InlineKeyboardButton{Text: GetString(chat.Id, "modules/listener.go:51"),
 					CallbackData: fmt.Sprintf("umute_%v", user.Id)}
 
 				kbk := make([][]ext.InlineKeyboardButton, 1)
 				kbk[0] = make([]ext.InlineKeyboardButton, 1)
-				kbk[0][0] = ext.InlineKeyboardButton{Text: "Unban Pengguna (Hanya Admin)",
+				kbk[0][0] = ext.InlineKeyboardButton{Text: GetString(chat.Id, "modules/listener.go:56"),
 					CallbackData: fmt.Sprintf("uba_%v", user.Id)}
 
 				// Implementing The Chosen Action To The Target
@@ -160,7 +161,7 @@ func picture(b ext.Bot, u *gotgbot.Update) error {
 	if db.Option != "true" {
 		return gotgbot.EndGroups{}
 	}
-	if chat_status.IsUserAdmin(chat, msg.From.Id, nil) == true {
+	if chat_status.IsUserAdmin(chat, msg.From.Id) == true {
 		return gotgbot.EndGroups{}
 	}
 
@@ -169,17 +170,18 @@ func picture(b ext.Bot, u *gotgbot.Update) error {
 
 	if photo != nil && photo.TotalCount == 0 {
 		bantime := extraction.ExtractTime(b, msg, sql.GetSetting(chat.Id).Time)
-		replytext := fmt.Sprintf("🔇 <a href=\"tg://user?id=%v\">%v</a> telah <b>di%v</b> "+
-			"karena belum memasang <b>foto profil</b>. [<code>%v</code>]", user.Id, user.FirstName, db.Action, user.Id)
+		replytext := GetStringf(msg.Chat.Id, "modules/listener.go:173",
+			map[string]string{"1": strconv.Itoa(user.Id), "2": user.FirstName, "3": db.Action,
+				"4": strconv.Itoa(user.Id)})
 
 		kb := make([][]ext.InlineKeyboardButton, 1)
 		kb[0] = make([]ext.InlineKeyboardButton, 1)
-		kb[0][0] = ext.InlineKeyboardButton{Text: "🔊 Sudah Pasang Profil Foto",
+		kb[0][0] = ext.InlineKeyboardButton{Text: GetString(chat.Id, "modules/listener.go:179"),
 			CallbackData: fmt.Sprintf("pmute_%v", user.Id)}
 
 		kbk := make([][]ext.InlineKeyboardButton, 1)
 		kbk[0] = make([]ext.InlineKeyboardButton, 1)
-		kbk[0][0] = ext.InlineKeyboardButton{Text: "Unban Pengguna (Hanya Admin)",
+		kbk[0][0] = ext.InlineKeyboardButton{Text: GetString(chat.Id, "modules/listener.go:184"),
 			CallbackData: fmt.Sprintf("pban_%v", user.Id)}
 
 		// Implementing The Chosen Action To The Target
@@ -287,19 +289,18 @@ func verify(b ext.Bot, u *gotgbot.Update) error {
 	if db.Option != "true" {
 		return gotgbot.EndGroups{}
 	}
-	if chat_status.IsUserAdmin(chat, msg.From.Id, nil) == true {
+	if chat_status.IsUserAdmin(chat, msg.From.Id) == true {
 		return gotgbot.EndGroups{}
 	}
 
 	if msg != nil {
 		bantime := extraction.ExtractTime(b, msg, sql.GetSetting(chat.Id).Time)
-		replytext := fmt.Sprintf("🙋‍♂ <a href=\"tg://user?id=%v\">%v</a> selamat datang "+
-			"di <b>%v</b>. Tekan tombol dibawah untuk verifikasi. [<code>%v</code>]",
-			user.Id, user.FirstName, chat.Title, user.Id)
+		replytext := GetStringf(msg.Chat.Id, "modules/listener.go:298",
+			map[string]string{"1": strconv.Itoa(user.Id), "2": user.FirstName, "3": chat.Title, "4": strconv.Itoa(user.Id)})
 
 		kb := make([][]ext.InlineKeyboardButton, 1)
 		kb[0] = make([]ext.InlineKeyboardButton, 1)
-		kb[0][0] = ext.InlineKeyboardButton{Text: "✅ Verifikasi Saya",
+		kb[0][0] = ext.InlineKeyboardButton{Text: GetString(chat.Id, "modules/listener.go:303"),
 			CallbackData: fmt.Sprintf("wlcm_%v", user.Id)}
 
 		restrictSend := b.NewSendableRestrictChatMember(chat.Id, user.Id)
@@ -347,7 +348,7 @@ func spam(b ext.Bot, u *gotgbot.Update) error {
 	chat := u.EffectiveChat
 	msg := u.EffectiveMessage
 
-	if chat_status.IsUserAdmin(chat, msg.From.Id, nil) == true {
+	if chat_status.IsUserAdmin(chat, msg.From.Id) == true {
 		return gotgbot.EndGroups{}
 	}
 	if chat_status.IsBotAdmin(chat, nil) == false {
@@ -415,6 +416,11 @@ func update(b ext.Bot, u *gotgbot.Update) error {
 		if sql.GetEnforceGban(chat.Id) == nil {
 			go sql.UpdateEnforceGban(chat.Id, "true")
 		}
+		if sql.GetLang(chat.Id) == nil {
+			sql.REDIS.Set(fmt.Sprintf("lang_%v", chat.Id), "ID", 0)
+			sql.REDIS.BgSave()
+			go sql.UpdateLang(chat.Id, "ID")
+		}
 	}
 	return gotgbot.ContinueGroups{}
 }
@@ -432,7 +438,7 @@ func usernamequery(b ext.Bot, u *gotgbot.Update) error {
 			if data == true {
 				if strings.Split(msg.Data, "umute_")[1] == strconv.Itoa(user.Id) {
 					if user.Username != "" {
-						_, err = b.AnswerCallbackQueryText(msg.Id, "Terimakasih !", true)
+						_, err = b.AnswerCallbackQueryText(msg.Id, GetString(chat.Id, "modules/listener.go:441"), true)
 						if err != nil {
 							_, err = b.AnswerCallbackQueryText(msg.Id, err.Error(), true)
 							return err
@@ -445,15 +451,15 @@ func usernamequery(b ext.Bot, u *gotgbot.Update) error {
 						_, err = b.UnRestrictChatMember(chat.Id, user.Id)
 						return err
 					} else {
-						_, err = b.AnswerCallbackQueryText(msg.Id, "Anda belum pasang username!", true)
+						_, err = b.AnswerCallbackQueryText(msg.Id, GetString(chat.Id, "modules/listener.go:454"), true)
 						return err
 					}
 				} else {
-					_, err = b.AnswerCallbackQueryText(msg.Id, "Anda bukan pengguna yang dimaksud!", true)
+					_, err = b.AnswerCallbackQueryText(msg.Id, GetString(chat.Id, "modules/listener.go:458"), true)
 					return err
 				}
 			} else if data2 == true {
-				if chat_status.IsUserAdmin(chat, user.Id, nil) == true {
+				if chat_status.IsUserAdmin(chat, user.Id) == true {
 					i, _ := strconv.Atoi(strings.Split(msg.Data, "uba_")[1])
 					_, err = b.UnbanChatMember(chat.Id, i)
 					_, err = b.AnswerCallbackQueryText(msg.Id, "Unbanned!", true)
@@ -489,7 +495,7 @@ func picturequery(b ext.Bot, u *gotgbot.Update) error {
 			if data == true {
 				if strings.Split(msg.Data, "pmute_")[1] == strconv.Itoa(user.Id) {
 					if photo.TotalCount != 0 {
-						_, err = b.AnswerCallbackQueryText(msg.Id, "Terimakasih !", true)
+						_, err = b.AnswerCallbackQueryText(msg.Id, GetString(chat.Id, "modules/listener.go:498"), true)
 						if err != nil {
 							_, err = b.AnswerCallbackQueryText(msg.Id, err.Error(), true)
 							return err
@@ -502,15 +508,15 @@ func picturequery(b ext.Bot, u *gotgbot.Update) error {
 						_, err = b.UnRestrictChatMember(chat.Id, user.Id)
 						return err
 					} else {
-						_, err = b.AnswerCallbackQueryText(msg.Id, "Anda belum pasang profil foto!", true)
+						_, err = b.AnswerCallbackQueryText(msg.Id, GetString(chat.Id, "modules/listener.go:511"), true)
 						return err
 					}
 				} else {
-					_, err = b.AnswerCallbackQueryText(msg.Id, "Anda bukan pengguna yang dimaksud!", true)
+					_, err = b.AnswerCallbackQueryText(msg.Id, GetString(chat.Id, "modules/listener.go:515"), true)
 					return err
 				}
 			} else if data2 == true {
-				if chat_status.IsUserAdmin(chat, user.Id, nil) == true {
+				if chat_status.IsUserAdmin(chat, user.Id) == true {
 					i, _ := strconv.Atoi(strings.Split(msg.Data, "pban_")[1])
 					_, err = b.UnbanChatMember(chat.Id, i)
 					_, err = b.AnswerCallbackQueryText(msg.Id, "Unbanned!", true)
@@ -543,25 +549,21 @@ func verifyquery(b ext.Bot, u *gotgbot.Update) error {
 			data, _ := regexp.MatchString("^wlcm_\\d+$", msg.Data)
 			if data == true {
 				if strings.Split(msg.Data, "wlcm_")[1] == strconv.Itoa(user.Id) {
-					if user.Username != "" {
-						_, err = b.AnswerCallbackQueryText(msg.Id, "Terimakasih !", true)
-						if err != nil {
-							_, err = b.AnswerCallbackQueryText(msg.Id, err.Error(), true)
-							return err
-						}
-						_, err = msg.Message.Delete()
-						if err != nil {
-							_, err = b.AnswerCallbackQueryText(msg.Id, err.Error(), true)
-							return err
-						}
-						_, err = b.UnRestrictChatMember(chat.Id, user.Id)
-						return err
-					} else {
-						_, err = b.AnswerCallbackQueryText(msg.Id, "Anda belum pasang username!", true)
+					_, err = b.AnswerCallbackQueryText(msg.Id, GetString(chat.Id, "modules/listener.go:552"), true)
+					if err != nil {
+						_, err = b.AnswerCallbackQueryText(msg.Id, err.Error(), true)
 						return err
 					}
+					_, err = msg.Message.Delete()
+					if err != nil {
+						_, err = b.AnswerCallbackQueryText(msg.Id, err.Error(), true)
+						return err
+					}
+					_, err = b.UnRestrictChatMember(chat.Id, user.Id)
+					return err
+
 				} else {
-					_, err = b.AnswerCallbackQueryText(msg.Id, "Anda bukan pengguna yang dimaksud!", true)
+					_, err = b.AnswerCallbackQueryText(msg.Id, GetString(chat.Id, "modules/listener.go:566"), true)
 					return err
 				}
 			}
@@ -575,8 +577,8 @@ func spamfunc(b ext.Bot, u *gotgbot.Update) error {
 	chat := u.EffectiveChat
 	msg := u.EffectiveMessage
 	db := sql.GetSetting(chat.Id)
-	txtBan := fmt.Sprintf("🚫 <a href=\"tg://user?id=%v\">%v</a> telah <b>diblokir</b> "+
-		"secara global. [<code>%v</code>]", user.Id, user.FirstName, user.Id)
+	txtBan := GetStringf(chat.Id, "modules/listener.go:580",
+		map[string]string{"1": strconv.Itoa(user.Id), "2": user.FirstName, "3": strconv.Itoa(user.Id)})
 
 	_, err := msg.ReplyHTMLf(txtBan)
 	if err != nil {

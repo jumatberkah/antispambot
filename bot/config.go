@@ -9,17 +9,17 @@ import (
 )
 
 type Config struct {
-	ApiKey    string
-	OwnerId   int
-	LogEvent  int
-	LogBan    int
-	SudoUsers []string
-	SqlUri    string
-	WebhookUrl 	string
-	WebhookPath string
-	WebhookPort int
-	RedisAddress 	string
-	RedisPassword 	string
+	ApiKey        string
+	OwnerId       int
+	LogEvent      int
+	LogBan        int
+	SudoUsers     []string
+	SqlUri        string
+	WebhookUrl    string
+	WebhookPath   string
+	WebhookPort   int
+	RedisAddress  string
+	RedisPassword string
 }
 
 var BotConfig Config

@@ -7,12 +7,13 @@ import (
 	"github.com/jumatberkah/antispambot/bot/helpers/err_handler"
 	"github.com/jumatberkah/antispambot/bot/modules"
 	"github.com/jumatberkah/antispambot/bot/modules/sql"
+	"log"
 )
 
 func main() {
 	// initiation
-	goloc.DefaultLang = "en-GB"
-	goloc.LoadAll("bot/trans")
+	goloc.LoadAll("en-GB")
+	goloc.LoadAll("ID")
 	updater, err := gotgbot.NewUpdater(bot.BotConfig.ApiKey)
 	err_handler.FatalError(err)
 
@@ -26,6 +27,7 @@ func main() {
 
 	// start clean polling / webhook
 	if bot.BotConfig.WebhookUrl != "" {
+		log.Print("Using Webhook...")
 		var web gotgbot.Webhook
 		web.URL = bot.BotConfig.WebhookUrl
 		web.MaxConnections = 40
@@ -35,6 +37,7 @@ func main() {
 		err_handler.HandleErr(err)
 		updater.StartWebhook(web)
 	} else {
+		log.Print("Using Long Polling...")
 		_ = updater.StartPolling()
 	}
 
